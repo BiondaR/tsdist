@@ -35,7 +35,7 @@
 
 ```bash
 # Clone and install in editable mode
-git clone https://github.com/YOUR_USERNAME/tsdist.git
+git clone https://github.com/BiondaR/tsdist.git
 cd tsdist
 pip install -e .
 ```
@@ -320,9 +320,9 @@ If you use `tsdist` in your research, please consider citing it:
 
 ```bibtex
 @software{tsdist2026,
-  author  = {YOUR NAME},
+  author  = {Bionda Rozin},
   title   = {tsdist: Distance \& Similarity Metrics for Vectors, Time Series, and Ranked Lists},
   year    = {2026},
-  url     = {https://github.com/YOUR_USERNAME/tsdist}
+  url     = {https://github.com/BiondaR/tsdist}
 }
 ```
