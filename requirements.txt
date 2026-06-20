@@ -1,0 +1,19 @@
+# Core (always required)
+numpy>=1.24
+scipy>=1.11
+scikit-learn>=1.3
+pandas>=2.0
+
+# Time-series metrics
+dtaidistance>=2.3
+
+# ANN backends
+annoy>=1.17
+hnswlib>=0.8
+
+# FAISS — choose ONE depending on your hardware:
+# faiss-cpu          # CPU only
+ faiss-gpu-cu12     # GPU (CUDA 12)
+
+# GPU support (optional — requires CUDA 12)
+# cupy-cuda12x>=13.0

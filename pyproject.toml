@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.backends.legacy:build"
+
+[project]
+name = "tsdist"
+version = "0.1.0"
+description = "Distance & similarity metrics for vectors, time series, and ranked lists"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+keywords = ["distance", "similarity", "time-series", "ranked-lists", "ann", "nearest-neighbors"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.11",
+    "scikit-learn>=1.3",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+dtw = ["dtaidistance>=2.3"]
+ann = [
+    "annoy>=1.17",
+    "hnswlib>=0.8",
+]
+# faiss: install manually — faiss-cpu or faiss-gpu-cu12 depending on your setup
+gpu = [
+    "cupy-cuda12x>=13.0",
+]
+all = [
+    "dtaidistance>=2.3",
+    "annoy>=1.17",
+    "hnswlib>=0.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/BiondaR/tsdist"
+Issues   = "https://github.com/BiondaR/tsdist/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tsdist*"]
