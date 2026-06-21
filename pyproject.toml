@@ -34,15 +34,13 @@ dtw = ["dtaidistance>=2.3"]
 ann = [
     "annoy>=1.17",
     "hnswlib>=0.8",
-]
-# faiss: install manually — faiss-cpu or faiss-gpu-cu12 depending on your setup
-gpu = [
-    "cupy-cuda12x>=13.0",
+    "faiss-cpu>=1.7",
 ]
 all = [
     "dtaidistance>=2.3",
     "annoy>=1.17",
     "hnswlib>=0.8",
+    "faiss-cpu>=1.7",
 ]
 
 [project.urls]
