@@ -10,13 +10,6 @@ try:
 except ImportError:
     _HAS_DTAI = False
 
-try:
-    import cupy as cp
-    from cuml.metrics import pairwise_distances as _gpu_pairwise
-    _HAS_GPU = True
-except ImportError:
-    _HAS_GPU = False
-
 
 class DistanceMatrixCalculator:
     """
@@ -33,22 +26,15 @@ class DistanceMatrixCalculator:
     data : array-like, pd.DataFrame, or list
         Input data. For vector/time-series metrics, shape (N, D).
         For ranked-list metrics, a 2-D array/list of ranked indices.
-    gpu : bool, optional
-        Use GPU acceleration where available (requires cupy + cuML).
-        Falls back to CPU automatically when GPU is unavailable.
     """
 
-    VECTOR_METRICS     = {'euclidean', 'manhattan', 'cosine', 'hamming'}
-    TS_METRICS         = {'dtw'}
-    RANKLIST_METRICS   = {'jaccard', 'jaccard_max', 'rbo', 'kendall'}
-    SUPPORTED_METRICS  = VECTOR_METRICS | TS_METRICS | RANKLIST_METRICS
+    VECTOR_METRICS    = {'euclidean', 'manhattan', 'cosine', 'hamming'}
+    TS_METRICS        = {'dtw'}
+    RANKLIST_METRICS  = {'jaccard', 'jaccard_max', 'rbo', 'kendall'}
+    SUPPORTED_METRICS = VECTOR_METRICS | TS_METRICS | RANKLIST_METRICS
 
-    def __init__(self, data=None, gpu: bool = False):
+    def __init__(self, data=None):
         self.data = data
-        self.gpu  = gpu and _HAS_GPU
-
-        if gpu and not _HAS_GPU:
-            print("[tsdist] GPU requested but cupy/cuML not found — falling back to CPU.")
 
     # ------------------------------------------------------------------
     # Data helpers
@@ -68,7 +54,7 @@ class DistanceMatrixCalculator:
             X = self.data.to_numpy()
             self.data = X.T if orient == 'series_as_cols' else X
         elif isinstance(self.data, np.ndarray):
-            pass  # already fine
+            pass
         elif isinstance(self.data, list):
             self.data = np.array(self.data)
         else:
@@ -106,7 +92,7 @@ class DistanceMatrixCalculator:
             union     = 2 * d - intersect
             jac       = intersect / union
             if jac == 1.0:
-                return 0.0  # distance = 1 - similarity
+                return 0.0
             if jac > best:
                 best = jac
         return 1.0 - best
@@ -155,11 +141,7 @@ class DistanceMatrixCalculator:
 
         # ── Vector metrics ────────────────────────────────────────────
         if metric in self.VECTOR_METRICS:
-            if self.gpu:
-                X_gpu  = cp.array(self.data, dtype=cp.float32)
-                dist_mat = cp.asnumpy(_gpu_pairwise(X_gpu, metric=metric))
-            else:
-                dist_mat = pairwise_distances(self.data, metric=metric)
+            dist_mat = pairwise_distances(self.data, metric=metric)
 
         # ── Time-series metric (DTW) ──────────────────────────────────
         elif metric == 'dtw':
@@ -181,7 +163,7 @@ class DistanceMatrixCalculator:
                         d = 1.0 - self._rbo(self.data[i], self.data[j], p=p)
                     elif metric == 'kendall':
                         tau, _ = kendalltau(self.data[i], self.data[j])
-                        d = 1.0 - (tau + 1) / 2  # normalised to [0, 1]
+                        d = 1.0 - (tau + 1) / 2
                     dist_mat[i, j] = dist_mat[j, i] = d
 
         if sparse:
