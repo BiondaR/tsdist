@@ -52,13 +52,6 @@ pip install -e ".[ann]"
 pip install -e ".[all]"
 ```
 
-**FAISS** must be installed separately depending on your hardware:
-
-```bash
-pip install faiss-cpu        # CPU only
-pip install faiss-gpu-cu12   # GPU (CUDA 12)
-```
-
 ---
 
 ## Quick Start / Tutorial
