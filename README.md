@@ -27,7 +27,6 @@
 | **Time series** | DTW (Dynamic Time Warping) |
 | **Ranked lists** | Jaccard, JaccardMax, RBO, Kendall |
 | **ANN search** | FAISS · HNSWLib · Annoy · BallTree |
-| **GPU support** | FAISS-GPU · CuPy/cuML (optional) |
 
 ---
 
@@ -49,7 +48,7 @@ pip install -e ".[dtw]"
 # ANN backends (Annoy + HNSWLib)
 pip install -e ".[ann]"
 
-# Everything except FAISS and GPU
+# Everything
 pip install -e ".[all]"
 ```
 
@@ -58,13 +57,6 @@ pip install -e ".[all]"
 ```bash
 pip install faiss-cpu        # CPU only
 pip install faiss-gpu-cu12   # GPU (CUDA 12)
-```
-
-**GPU (CuPy + cuML)** for vector metrics:
-
-```bash
-pip install cupy-cuda12x
-# cuML installation: https://docs.rapids.ai/install
 ```
 
 ---
@@ -95,7 +87,7 @@ df = pd.DataFrame(data, index=dates, columns=cols)
 ```python
 from tsdist import DistanceMatrixCalculator
 
-d = DistanceMatrixCalculator(df, gpu=False)
+d = DistanceMatrixCalculator(df)
 
 # Orient: 'series_as_cols' because each column is one series
 d.to_numpy(orient='series_as_cols')   # shape becomes (20, 100)
@@ -142,12 +134,11 @@ import numpy as np
 ranked = np.argsort(d.compute_matrix(metric='euclidean'))
 
 # Step 3: new calculator operating on ranked lists
-from tsdist import DistanceMatrixCalculator
 rk = DistanceMatrixCalculator(ranked)
 
 kendall    = rk.compute_matrix(metric='kendall')
-rbo        = rk.compute_matrix(metric='rbo',        p=0.9)
-jaccard    = rk.compute_matrix(metric='jaccard',    k=20)
+rbo        = rk.compute_matrix(metric='rbo',         p=0.9)
+jaccard    = rk.compute_matrix(metric='jaccard',     k=20)
 jaccardmax = rk.compute_matrix(metric='jaccard_max', k=20)
 ```
 
@@ -208,18 +199,6 @@ dists, idxs  = engine.query(queries, k=10)
 ranked_lists = engine.get_ranked_lists(k=3)
 ```
 
-#### 3.5 GPU (FAISS)
-
-```python
-# Requires: pip install faiss-gpu-cu12
-engine = SimilaritySearchEngine(method='faiss', metric='euclidean', gpu=True)
-engine.fit(df, orient='series_as_cols')
-ranked_lists = engine.get_ranked_lists(k=20)
-```
-
-> If no GPU is found, tsdist falls back to CPU automatically with a warning.  
-> Se nenhuma GPU for encontrada, tsdist volta para CPU automaticamente com um aviso.
-
 ---
 
 ## API Reference
@@ -227,7 +206,7 @@ ranked_lists = engine.get_ranked_lists(k=20)
 ### `DistanceMatrixCalculator`
 
 ```
-DistanceMatrixCalculator(data=None, gpu=False)
+DistanceMatrixCalculator(data=None)
 ```
 
 | Method | Description |
@@ -250,7 +229,7 @@ DistanceMatrixCalculator(data=None, gpu=False)
 ### `SimilaritySearchEngine`
 
 ```
-SimilaritySearchEngine(method='faiss', metric='euclidean', gpu=False,
+SimilaritySearchEngine(method='faiss', metric='euclidean',
                        n_trees=50, hnsw_m=16, hnsw_ef=50)
 ```
 
@@ -276,20 +255,6 @@ SimilaritySearchEngine(method='faiss', metric='euclidean', gpu=False,
 | `jaccard_max` | `DistanceMatrixCalculator` | Ranked lists only; best Jaccard over top-k prefixes |
 | `rbo` | `DistanceMatrixCalculator` | Rank-Biased Overlap (Webber et al., 2010) |
 | `kendall` | `DistanceMatrixCalculator` | Kendall's τ, normalised to [0, 1] |
-
----
-
-## GPU Support / Suporte a GPU
-
-| Backend | GPU support | How |
-|---|---|---|
-| FAISS | ✅ Native | `faiss-gpu-cu12` + `gpu=True` |
-| HNSWLib | ❌ | CPU only |
-| Annoy | ❌ | CPU only |
-| BallTree | ❌ | CPU only |
-| Vector metrics (euclidean, cosine…) | ✅ Via cuML | `cupy-cuda12x` + cuML + `gpu=True` |
-| DTW | ❌ | CPU only (dtaidistance) |
-| Ranked-list metrics | ❌ | CPU only |
 
 ---
 
