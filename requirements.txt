@@ -10,10 +10,4 @@ dtaidistance>=2.3
 # ANN backends
 annoy>=1.17
 hnswlib>=0.8
-
-# FAISS — choose ONE depending on your hardware:
-# faiss-cpu          # CPU only
-# faiss-gpu-cu12     # GPU (CUDA 12)
-
-# GPU support (optional — requires CUDA 12)
-# cupy-cuda12x>=13.0
+faiss-cpu>=1.7
